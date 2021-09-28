@@ -6,15 +6,12 @@ namespace VRGunGame
 {
 	partial class Player : Sandbox.Player
 	{
-		[Net, Predicted] AnimEntity LeftHand { get; set; }
-		[Net, Predicted] AnimEntity RightHand { get; set; }
-
 		public override void Respawn()
 		{
 			// If not in VR just give em a regular player
 			if ( !Input.VR.IsActive )
 			{
-				Log.Info( "Not in VR." );
+				Log.Info( $"{Owner.Name}, we're not in VR." );
 
 				Controller = new WalkController();
 				Camera = new FirstPersonCamera();
@@ -31,10 +28,10 @@ namespace VRGunGame
 				return;
 			}
 
-			Log.Info( "We're in VR!" );
-			
+			Log.Info( $"{Owner.Name}, we're in VR!" );
+
 			Controller = new WalkController();
-			Camera = new FirstPersonCamera(); 
+			Camera = new FirstPersonCamera();
 			Animator = new StandardPlayerAnimator();
 
 			SetModel( "models/citizen/citizen.vmdl" );
@@ -44,45 +41,28 @@ namespace VRGunGame
 			EnableHideInFirstPerson = true;
 			EnableShadowInFirstPerson = false;
 
+			// Create our VR hands!
+			CreateVRHands();
+
 			base.Respawn();
 		}
 
-		/// <summary>
-		/// Called every tick!!!
-		/// </summary>
 		public override void Simulate( Client cl )
 		{
 			base.Simulate( cl );
 
 			if ( !Input.VR.IsActive || !IsServer ) return;
-
-			if (LeftHand == null)
-			{
-				LeftHand = new AnimEntity();
-				LeftHand.SetModel( "models/hands/alyx_hand_left.vmdl" );
-			}
-
-			if ( RightHand == null )
-			{
-				RightHand = new AnimEntity();
-				RightHand.SetModel( "models/hands/alyx_hand_right.vmdl" );
-			}
-
-			LeftHand.Transform = Input.VR.LeftHand.Transform;
-			RightHand.Transform = Input.VR.RightHand.Transform;
-
-			LeftHand.SetAnimFloat( "Thumb", Input.VR.LeftHand.GetFingerValue( FingerValue.ThumbCurl ) );
-			LeftHand.SetAnimFloat( "Index", Input.VR.LeftHand.GetFingerValue( FingerValue.IndexCurl ) );
-			LeftHand.SetAnimFloat( "Middle", Input.VR.LeftHand.GetFingerValue( FingerValue.MiddleCurl ) );
-			LeftHand.SetAnimFloat( "Ring", Input.VR.LeftHand.GetFingerValue( FingerValue.RingCurl ) );
-
-			RightHand.SetAnimFloat( "Thumb", Input.VR.RightHand.GetFingerValue( FingerValue.ThumbCurl ) );
-			RightHand.SetAnimFloat( "Index", Input.VR.RightHand.GetFingerValue( FingerValue.IndexCurl ) );
-			RightHand.SetAnimFloat( "Middle", Input.VR.RightHand.GetFingerValue( FingerValue.MiddleCurl ) );
-			RightHand.SetAnimFloat( "Ring", Input.VR.RightHand.GetFingerValue( FingerValue.RingCurl ) );
+			SimulateServerHands();
 
 			// If you have active children (like a weapon etc) you should call this to simulate those too.
 			SimulateActiveChild( cl, ActiveChild );
+		}
+		public override void FrameSimulate(Client cl)
+		{
+			base.FrameSimulate( cl );
+
+			if ( !Input.VR.IsActive ) return;
+			SimulateLocalHands();
 		}
 
 		public override void OnKilled()
@@ -97,5 +77,6 @@ namespace VRGunGame
 
 			EnableDrawing = false;
 		}
+
 	}
 }
