@@ -57,13 +57,13 @@ namespace VRGunGame
 			// If you have active children (like a weapon etc) you should call this to simulate those too.
 			SimulateActiveChild( cl, ActiveChild );
 		}
-		public override void FrameSimulate(Client cl)
+		/*public override void FrameSimulate(Client cl)
 		{
 			base.FrameSimulate( cl );
 
-			if ( !Input.VR.IsActive ) return;
+			if ( !Input.VR.IsActive || !IsServer ) return;
 			SimulateLocalHands();
-		}
+		}*/
 
 		public override void OnKilled()
 		{
