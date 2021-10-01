@@ -50,12 +50,13 @@ namespace VRGunGame
 		public override void Simulate( Client cl )
 		{
 			base.Simulate( cl );
+			
+			// If you have active children (like a weapon etc) you should call this to simulate those too.
+			SimulateActiveChild( cl, ActiveChild );
 
 			if ( !Input.VR.IsActive || !IsServer ) return;
 			SimulateServerHands();
 
-			// If you have active children (like a weapon etc) you should call this to simulate those too.
-			SimulateActiveChild( cl, ActiveChild );
 		}
 
 		public override void OnKilled()

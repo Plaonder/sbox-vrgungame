@@ -41,13 +41,10 @@ namespace VRGunGame
 
 		public void SimulateServerHands()
 		{
-			LeftHand.Position = Input.VR.LeftHand.Transform.Position * PosOffset;
+			LeftHand.Position = Velocity + ((Input.VR.LeftHand.Transform.Position * PosOffset) - LeftHand.Position) / Time.Delta + Input.VR.LeftHand.Velocity;
 			LeftHand.Rotation = Input.VR.LeftHand.Transform.Rotation * RotOffset;
 
-			LeftHand.PhysicsEnabled = true;
-			RightHand.PhysicsEnabled = true;
-
-			RightHand.Position = Input.VR.RightHand.Transform.Position;
+			RightHand.Velocity = Velocity + ((Input.VR.RightHand.Transform.Position * PosOffset) - RightHand.Position) / Time.Delta + Input.VR.RightHand.Velocity;
 			RightHand.Rotation = Input.VR.RightHand.Transform.Rotation;
 		}
 	}
